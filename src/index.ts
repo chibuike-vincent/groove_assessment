@@ -16,7 +16,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.get("/", (_, res) => {
-  res.send("groove api running in good health state")
+  res.status(200).json({message:"groove api running in good health state"})
 });
 app.use("/api/v1/auth", auth);
 app.use("/api/v1/project", project);
