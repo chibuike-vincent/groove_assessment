@@ -1,0 +1,48 @@
+import mongoose from "mongoose";
+
+// Define schema for Project collection
+interface IProject extends Document {
+  name: string;
+  artist: string;
+  targetAmount: number;
+  currentAmount: number;
+  unitPrice: number;
+  createdBy: mongoose.Types.ObjectId;
+}
+
+const projectSchema = new mongoose.Schema<IProject>(
+  {
+    name: {
+      type: String,
+      required: true,
+    },
+    artist: {
+      type: String,
+      required: true,
+    },
+    targetAmount: {
+      type: Number,
+      required: true,
+    },
+    unitPrice: {
+      type: Number,
+      required: true,
+    },
+    currentAmount: {
+      type: Number,
+      default: 0,
+    },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+const Project = mongoose.model("Project", projectSchema);
+
+export default Project;
