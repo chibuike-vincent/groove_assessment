@@ -101,6 +101,19 @@ export const login = async (req: Request, res: Response) => {
 };
 
 
+export const getUserWallet = async (req: any, res: Response) => {
+  try {
+    const id = new mongoose.Types.ObjectId(req.user.sub);
+    const wallet = await Wallet.findOne({owner: id});
+    if (!wallet) {
+      return res.status(404).send({ message: "Wallet not found" });
+    }
+    return res.status(200).send(wallet);
+  } catch (err: any) {
+    return res.status(500).send({ message: err.message });
+  }
+};
+
 // Update an artist by ID
 export const fundWallet = async (req: any, res: Response) => {
   try {
@@ -119,3 +132,4 @@ export const fundWallet = async (req: any, res: Response) => {
     return res.status(500).send({ message: err.message });
   }
 };
+

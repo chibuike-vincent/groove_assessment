@@ -4,6 +4,7 @@ import Project from "../../models/projects";
 import { ObjectId } from "mongodb";
 import { validationResult } from "express-validator";
 import Wallet from "../../models/wallet";
+import mongoose from "mongoose";
 
 // Get all tokens
 export const getAllProjectToken = async (req: Request, res: Response) => {
@@ -59,7 +60,7 @@ export const buyToken = async (req: any, res: Response) => {
       return res.status(302).json({ message: `Number od available token is ${project.totalToken}` });
     }
 
-    const wallet:any = await Wallet.findOne({owner: req.user.sub})
+    const wallet:any = await Wallet.findOne({owner: new mongoose.Types.ObjectId(req.user.sub)})
 
     const saleAmount = Number(req.body.amount) * Number(project.unitPrice)
 
@@ -91,7 +92,9 @@ export const buyToken = async (req: any, res: Response) => {
     await token.save();
     project.totalToken -= Number(req.body.amount)
     project.currentAmount += Number(req.body.amount) * Number(project.unitPrice)
-    project.save()
+    wallet.balance -= saleAmount
+    await project.save()
+    await wallet.save()
 
     // Return success response
     return res.status(201).json(token);
