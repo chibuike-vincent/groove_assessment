@@ -4,8 +4,8 @@ import mongoose from "mongoose";
 interface IToken extends Document {
   investor: mongoose.Types.ObjectId;
   project: mongoose.Types.ObjectId;
-  amount: number;
-  transactionType: "buy" | "sell";
+  costOfToken: number;
+  totalUserToken: number;
 }
 
 const tokenSchema = new mongoose.Schema<IToken>(
@@ -20,14 +20,10 @@ const tokenSchema = new mongoose.Schema<IToken>(
       ref: "User",
       required: true,
     },
-    amount: {
+    totalUserToken: {
       type: Number,
       required: true,
-    },
-    transactionType: {
-      type: String,
-      required: true,
-    },
+    }
   },
   {
     timestamps: true,

@@ -54,19 +54,37 @@ export const buyToken = async (req: any, res: Response) => {
       return res.status(404).json({ message: "Project not found" });
     }
 
-    // Create new token for project
+    if(project.totalToken < req.body.amount){
+      return res.status(302).json({ message: `Number od available token is ${project.totalToken}` });
+    }
+
+    const existingToken = await Token.findOne({project:projectId})
+    if(existingToken){
+      existingToken.totalUserToken += req.body.amount
+      existingToken.save()
+      project.totalToken -= Number(req.body.amount)
+      project.currentAmount += Number(req.body.amount) * Number(project.unitPrice)
+      project.save()
+  
+      // Return success response
+      return res.status(201).json(existingToken);
+    }else {
+      // Create new token for project
     const token = new Token({
       project: project._id,
-      amount: req.body.amount,
-      transactionType: "buy",
+      totalUserToken: req.body.amount,
       investor: req.user.sub,
     });
 
     // Save token to database
     await token.save();
+    project.totalToken -= Number(req.body.amount)
+    project.currentAmount += Number(req.body.amount) * Number(project.unitPrice)
+    project.save()
 
     // Return success response
     return res.status(201).json(token);
+    }
   } catch (err: any) {
     console.error(err.message);
     return res.status(500).send("Internal Server Error");
@@ -90,7 +108,6 @@ export const sellToken = async (req: any, res: Response) => {
 
     // Retrieve token by ID
     const token = await Token.findById(tokenId);
-    console.log(token, "fffff");
     if (!token) {
       return res.status(404).json({ message: "Token not found" });
     }
@@ -101,12 +118,11 @@ export const sellToken = async (req: any, res: Response) => {
     }
 
     // Calculate sale amount based on token amount and unit price
-    const saleAmount = Number(token.amount) * Number(project.unitPrice);
+    const saleAmount = Number(req.body.amount) * Number(project.unitPrice);
 
-    console.log(saleAmount, token.amount, project.unitPrice, "saleAmount");
     // Update token and project
-    token.amount -= req.body.amount;
-    token.transactionType = "sell";
+    token.totalUserToken -= req.body.amount;
+    project.totalToken += req.body.amount
     project.currentAmount -= saleAmount;
     await token.save();
     await project.save();

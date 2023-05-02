@@ -7,6 +7,7 @@ interface IProject extends Document {
   targetAmount: number;
   currentAmount: number;
   unitPrice: number;
+  totalToken: number;
   createdBy: mongoose.Types.ObjectId;
 }
 
@@ -27,6 +28,10 @@ const projectSchema = new mongoose.Schema<IProject>(
     unitPrice: {
       type: Number,
       required: true,
+    },
+    totalToken: {
+      type: Number,
+      required: true
     },
     currentAmount: {
       type: Number,

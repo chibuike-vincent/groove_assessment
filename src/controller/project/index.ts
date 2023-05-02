@@ -11,11 +11,13 @@ export const creatProject = async (req: any, res: Response) => {
       return res.status(400).json({ errors: errors.array() });
     }
     const { name, artist, targetAmount, unitPrice } = req.body;
+    let totalT = Number(targetAmount) / Number(unitPrice)
     const project = new Project({
       name,
       artist,
       targetAmount,
       unitPrice,
+      totalToken: totalT,
       createdBy: req.user.sub,
     });
     await project.save();

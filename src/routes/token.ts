@@ -15,7 +15,7 @@ router.get("/:projectId/tokens", isAuth, getAllProjectToken);
 router.get("/", isAuth, getAllUserToken);
 router.get("/:tokenId", isAuth, getTokenById);
 router.post(
-  "/:projectId/tokens/buy",
+  "/:projectId/token/buy",
   isAuth,
   [check("amount").isNumeric()],
   buyToken
