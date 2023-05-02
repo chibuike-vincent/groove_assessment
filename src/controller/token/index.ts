@@ -3,6 +3,7 @@ import Token from "../../models/tokens";
 import Project from "../../models/projects";
 import { ObjectId } from "mongodb";
 import { validationResult } from "express-validator";
+import Wallet from "../../models/wallet";
 
 // Get all tokens
 export const getAllProjectToken = async (req: Request, res: Response) => {
@@ -31,7 +32,7 @@ export const getTokenById = async (req: Request, res: Response) => {
     const tokenId = req.params.tokenId;
     const token = await Token.findOne({ _id: new ObjectId(tokenId) });
     if (!token) {
-      return res.status(404).send("Token not found");
+      return res.status(404).json({message: "Token not found"});
     } else {
       return res.json(token);
     }
@@ -58,13 +59,23 @@ export const buyToken = async (req: any, res: Response) => {
       return res.status(302).json({ message: `Number od available token is ${project.totalToken}` });
     }
 
+    const wallet:any = await Wallet.findOne({owner: req.user.sub})
+
+    const saleAmount = Number(req.body.amount) * Number(project.unitPrice)
+
+    if(wallet.balance < saleAmount){
+      return res.status(400).json({ message: "Insufficient wallet balance!" });
+    }
+
     const existingToken = await Token.findOne({project:projectId})
     if(existingToken){
       existingToken.totalUserToken += req.body.amount
-      existingToken.save()
+      wallet.balance -= saleAmount
       project.totalToken -= Number(req.body.amount)
       project.currentAmount += Number(req.body.amount) * Number(project.unitPrice)
-      project.save()
+      await wallet.save()
+      await existingToken.save()
+      await project.save()
   
       // Return success response
       return res.status(201).json(existingToken);
@@ -120,12 +131,16 @@ export const sellToken = async (req: any, res: Response) => {
     // Calculate sale amount based on token amount and unit price
     const saleAmount = Number(req.body.amount) * Number(project.unitPrice);
 
+    const wallet:any = await Wallet.findOne({owner: req.user.sub})
+
     // Update token and project
     token.totalUserToken -= req.body.amount;
     project.totalToken += req.body.amount
     project.currentAmount -= saleAmount;
+    wallet.balance += saleAmount
     await token.save();
     await project.save();
+    await wallet.save()
 
     // Return success response
     return res.json(token);

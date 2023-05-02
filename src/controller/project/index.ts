@@ -10,11 +10,11 @@ export const creatProject = async (req: any, res: Response) => {
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-    const { name, artist, targetAmount, unitPrice } = req.body;
+    const { name, artistId, targetAmount, unitPrice } = req.body;
     let totalT = Number(targetAmount) / Number(unitPrice)
     const project = new Project({
       name,
-      artist,
+      artist: artistId,
       targetAmount,
       unitPrice,
       totalToken: totalT,
@@ -31,6 +31,16 @@ export const creatProject = async (req: any, res: Response) => {
 export const getAllProjects = async (_: Request, res: Response) => {
   try {
     const projects = await Project.find();
+    return res.status(200).send(projects);
+  } catch (err: any) {
+    return res.status(500).send({ message: err.message });
+  }
+};
+
+// Get all projects
+export const getAllArtistProjects = async (req: Request, res: Response) => {
+  try {
+    const projects = await Project.find({artist:req.params.id});
     return res.status(200).send(projects);
   } catch (err: any) {
     return res.status(500).send({ message: err.message });

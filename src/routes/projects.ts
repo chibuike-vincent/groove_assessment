@@ -5,6 +5,7 @@ import {
   getProjectById,
   updateProject,
   deleteProject,
+  getAllArtistProjects
 } from "../controller/project";
 import { isAuth } from "../helpers/isAuthenticated";
 import { checkUserType } from "../helpers/checkUserType";
@@ -18,13 +19,14 @@ router.post(
   checkUserType,
   [
     check("name").not().isEmpty(),
-    check("artist").not().isEmpty(),
+    check("artistId").not().isEmpty(),
     check("targetAmount").isNumeric(),
     check("unitPrice").isNumeric(),
   ],
   creatProject
 );
 router.get("/", isAuth, getAllProjects);
+router.get("/artist/:id", isAuth, getAllArtistProjects)
 router.get("/:id", isAuth, getProjectById);
 router.put("/:id", isAuth, checkUserType, updateProject);
 router.delete("/:id", isAuth, checkUserType, deleteProject);

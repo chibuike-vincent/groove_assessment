@@ -4,6 +4,7 @@ import db from "./db_config";
 import auth from "./routes/auth";
 import project from "./routes/projects";
 import token from "./routes/token";
+import artist from "./routes/artist"
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ app.get("/", (_, res) => {
 app.use("/api/v1/auth", auth);
 app.use("/api/v1/project", project);
 app.use("/api/v1/token", token);
+app.use("/api/v1/artist", artist);
 
 const PORT = process.env.PORT;
 

@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 // Define schema for Project collection
 interface IProject extends Document {
   name: string;
-  artist: string;
+  artist: mongoose.Types.ObjectId;
   targetAmount: number;
   currentAmount: number;
   unitPrice: number;
@@ -18,7 +18,8 @@ const projectSchema = new mongoose.Schema<IProject>(
       required: true,
     },
     artist: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Artist",
       required: true,
     },
     targetAmount: {

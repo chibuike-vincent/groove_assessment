@@ -4,7 +4,6 @@ import mongoose from "mongoose";
 interface IToken extends Document {
   investor: mongoose.Types.ObjectId;
   project: mongoose.Types.ObjectId;
-  costOfToken: number;
   totalUserToken: number;
 }
 

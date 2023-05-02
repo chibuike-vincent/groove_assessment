@@ -2,7 +2,9 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../../models/users";
+import Wallet from "../../models/wallet"
 import { validationResult } from "express-validator";
+import mongoose from "mongoose";
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -37,6 +39,7 @@ export const register = async (req: Request, res: Response) => {
       userType: userT,
     });
     await newUser.save();
+    await Wallet.create({owner: newUser._id })
 
     // Generate a JWT
     const secret: any = process.env.SECRET;
@@ -94,5 +97,25 @@ export const login = async (req: Request, res: Response) => {
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+
+// Update an artist by ID
+export const fundWallet = async (req: any, res: Response) => {
+  try {
+    const { amount } = req.body;
+    const id = new mongoose.Types.ObjectId(req.user.sub);
+    const wallet = await Wallet.findOneAndUpdate(
+      {owner: id},
+      { balance: amount },
+      { new: true }
+    );
+    if (!wallet) {
+      return res.status(404).send({ message: "Wallet not found" });
+    }
+    return res.status(200).send(wallet);
+  } catch (err: any) {
+    return res.status(500).send({ message: err.message });
   }
 };
