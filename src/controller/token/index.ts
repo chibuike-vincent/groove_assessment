@@ -131,10 +131,15 @@ export const sellToken = async (req: any, res: Response) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
+     // Check if user has enough token
+     if (token.totalUserToken < req.body.amount) {
+      return res.status(302).json({ message: "Insuffucient Token!" });
+    }
+
     // Calculate sale amount based on token amount and unit price
     const saleAmount = Number(req.body.amount) * Number(project.unitPrice);
 
-    const wallet:any = await Wallet.findOne({owner: req.user.sub})
+    const wallet:any = await Wallet.findOne({owner: new mongoose.Types.ObjectId(req.user.sub)})
 
     // Update token and project
     token.totalUserToken -= req.body.amount;
