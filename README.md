@@ -1,0 +1,3 @@
+Important Information On Api Usage.
+
+`Auth`: The auth implementation includes authenticating and authorizing users. There are two types of users whaich are the poprevadmin and regular users. To create an admin account the username `must` include `poprevadmin` e.g `admin.poprevadmin`, `poprevadmin`, `poprevadmin_chukwudi` etc. This will enable the system see this user as a super admin who can create artists and projects.
